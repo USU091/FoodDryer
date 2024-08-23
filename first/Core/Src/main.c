@@ -28,6 +28,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 #include <stdio.h>
+#include "fnd_controller.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -40,7 +41,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-int button_state = 0;
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -48,13 +50,18 @@ int button_state = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int _write(int file, char * p, int len)
+{
+	HAL_UART_Transmit(&huart1, (uint8_t *)p, len, 10);
+	return len;
+}
 /* USER CODE END 0 */
 
 /**
@@ -85,7 +92,23 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  /*
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_LED_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIO_LED_GPIO_Port, &GPIO_InitStruct);
+  	*/
+    //volatile unsigned int * reg2 = 0x40011004;
+    //*reg2 = (*reg2 & ~(15UL << 20U)) | (3U << 20U);
+
+
+
+
+    init_fnd();
 
   /* USER CODE END 2 */
 
@@ -94,8 +117,77 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  button_state = HAL_GPIO_ReadPin(PB0_TEMP_SET_UP_GPIO_Port, PB0_TEMP_SET_UP_Pin);
+	  //i++;
+	  /*
+	  te.a++;
+	  te.b++;
+	  te.c++;
+
+	  printf("====================\r\n");
+	  printf("a = %d\r\n", te.a);
+	  printf("b = %d\r\n", te.b);
+	  printf("c = %d\r\n", te.c);
+	  printf("f = %f\r\n", ff);
+	  printf("====================\r\n");
+
+	  *reg3 = 0x2000;
+
+	  HAL_Delay(100);
+
+	  *reg3 = (0x2000 << 16);
+
+	  HAL_Delay(100);
+
+	  */
+	  //printf("i = %d\r\n", i);
+	  //HAL_UART_Transmit(&huart1, sednData, strlen(sednData), 1000);
+	  //HAL_Delay(1000);
+	  /*HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, 1);
+	  HAL_Delay(100);
+	  HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, 0);
+	  HAL_Delay(100);
+		*/
+
+	  /*
+	 if(! HAL_GPIO_ReadPin(GPIO_SWITCH_GPIO_Port, GPIO_SWITCH_Pin))
+	 {
+		 HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, 0);
+	 }
+	 else
+	 {
+		 HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, 1);
+	 }
+
+	 H AL_Delay(100);
+
+	 */
+
+	  /*
+	  if(!HAL_GPIO_ReadPin(PB0_TEMP_SET_UP_GPIO_Port, PB0_TEMP_SET_UP_Pin))
+	  {
+		  HAL_GPIO_WritePin(PB6_LED1_GPIO_Port, PB6_LED1_Pin, 0);
+	  }
+	  else
+	  {
+		  HAL_GPIO_WritePin(PB6_LED1_GPIO_Port, PB6_LED1_Pin, 1);
+	  }
 	  HAL_Delay(500);
+
+*/
+
+	 //send_port(0x88, 0b0001);
+
+
+		for (int i = 0; i <= 9999; i++) {
+
+			digit4_replay(i, 50); //send counter 0-9999 with delay 50 cicles and hide zero
+
+		}
+
+
+		//send_port(0x88, 0b0001);
+
+		//HAL_Delay(500);
 
     /* USER CODE BEGIN 3 */
   }
@@ -138,6 +230,39 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -147,13 +272,48 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, FND_RCLK_Pin|FND_DIO_Pin|FND_SCLK_Pin|PB6_LED1_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin : GPIO_LED_Pin */
+  GPIO_InitStruct.Pin = GPIO_LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIO_LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : GPIO_SWITCH_Pin */
+  GPIO_InitStruct.Pin = GPIO_SWITCH_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIO_SWITCH_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB0_TEMP_SET_UP_Pin */
   GPIO_InitStruct.Pin = PB0_TEMP_SET_UP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(PB0_TEMP_SET_UP_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : FND_RCLK_Pin FND_DIO_Pin FND_SCLK_Pin */
+  GPIO_InitStruct.Pin = FND_RCLK_Pin|FND_DIO_Pin|FND_SCLK_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB6_LED1_Pin */
+  GPIO_InitStruct.Pin = PB6_LED1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(PB6_LED1_GPIO_Port, &GPIO_InitStruct);
 
 }
 
