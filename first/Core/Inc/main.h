@@ -62,6 +62,8 @@ void Error_Handler(void);
 #define GPIO_LED_GPIO_Port GPIOC
 #define GPIO_SWITCH_Pin GPIO_PIN_0
 #define GPIO_SWITCH_GPIO_Port GPIOA
+#define PA3_TEMP_DATA_Pin GPIO_PIN_3
+#define PA3_TEMP_DATA_GPIO_Port GPIOA
 #define PB0_TEMP_SET_UP_Pin GPIO_PIN_0
 #define PB0_TEMP_SET_UP_GPIO_Port GPIOB
 #define FND_RCLK_Pin GPIO_PIN_13
@@ -70,8 +72,11 @@ void Error_Handler(void);
 #define FND_DIO_GPIO_Port GPIOB
 #define FND_SCLK_Pin GPIO_PIN_15
 #define FND_SCLK_GPIO_Port GPIOB
+#define PB5_RELAY_ON_OFF_CTRL_Pin GPIO_PIN_5
+#define PB5_RELAY_ON_OFF_CTRL_GPIO_Port GPIOB
 #define PB6_LED1_Pin GPIO_PIN_6
 #define PB6_LED1_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -81,5 +86,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
